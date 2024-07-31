@@ -14,6 +14,18 @@ async def run_all_requests_example():
     # First, create a default config set:
     config = AutctConfig()
 
+    # Here is where you can add specific settings for your environment,
+    # by editing the `config` object. For example:
+    #
+    # config.rpc_port = 12345
+    #
+    # config.keysets = anothercontext:anotherkeysetfile
+    #
+    # etc.
+    #
+    # Examine the definition of the dataclass AutctConfig or look at
+    # ~/.config/autct/default-config.toml for the full list.
+
     # parameters for "prove":
     # this is just an example; the private key 040404... stored in a file
     config.privkey_file_str = "privkey-four"

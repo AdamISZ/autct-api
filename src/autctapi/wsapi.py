@@ -68,9 +68,15 @@ class AutctConfig:
                 "bc_network":self.bc_network}
 
     def config_to_verify_req(self, proof):
+        # Note that for some reason, the verify call specifically
+        # requires the context label to be set, but ignores the keyset,
+        # using the context label as an index into its internal list,
+        # to decide which curve tree to use. This is (in the general case)
+        # an error, and will be fixed upstream.
+        ctxt_label = self.keysets.split(":")[0]
         return {"keyset":self.keysets,
                 "user_label":self.user_string,
-                "context_label":"my-context", #TODO; is this ignored in server?
+                "context_label":ctxt_label,
                 "application_label":"autct-v1.0",
                 "proof":proof}
 
