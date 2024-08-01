@@ -28,13 +28,21 @@ RPC_PROOF_ERRORCODES = {0: "Success.",
                         -5: "Proving request rejected, wrong bitcoin network.",
                         -6: "Proving request rejected, could not read private key from file.",
                         -7: "Proving request rejected, invalid private key format (must be WIF or hex).",
-                        -8: "Proving request rejected, provided key is not in the keyset"}
+                        -8: "Proving request rejected, provided key is not in the keyset",
+                        -9: "Keyset string has incorrect syntax.",
+                        -10: "Ped-DLEQ proof serialization error.",
+                        -11: "Curve point serialization failure.",
+                        -12: "Bulletproof serialization error.",
+                        -13: "Curve tree merkle path serialization error."}
 
 RPC_VERIFY_ERRORCODES = {1: "Request was accepted by the Autct verifier! The proof is valid and the (unknown) pubkey is unused.",
                         -1: "Request rejected, PedDLEQ proof does not match the tree.",
                         -2: "Request rejected, PedDLEQ proof is invalid.",
                         -3: "Request rejected, proofs are valid but key image is reused.",
-                        -4: "Request rejected, keyset chosen does not match the server's."}
+                        -4: "Request rejected, keyset chosen does not match the server's.",
+                        -5: "Invalid encoding of proof, should be base64.",
+                        -6: "Curve point deserialization failure in proof.",
+                        -7: "PedDLEQ proof deserialization failed."}
 
 RPC_CREATEKEYS_ERRORCODES = {0: "New key and address generated successfully",
                              -1: "Undefined failure in key generation.",
