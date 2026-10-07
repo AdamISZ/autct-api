@@ -33,7 +33,8 @@ RPC_PROOF_ERRORCODES = {0: "Success.",
                         -10: "Ped-DLEQ proof serialization error.",
                         -11: "Curve point serialization failure.",
                         -12: "Bulletproof serialization error.",
-                        -13: "Curve tree merkle path serialization error."}
+                        -13: "Curve tree merkle path serialization error.",
+                        -14: "Private key file decryption error."}
 
 RPC_VERIFY_ERRORCODES = {1: "Request was accepted by the Autct verifier! The proof is valid and the (unknown) pubkey is unused.",
                         -1: "Request rejected, PedDLEQ proof does not match the tree.",
@@ -42,7 +43,8 @@ RPC_VERIFY_ERRORCODES = {1: "Request was accepted by the Autct verifier! The pro
                         -4: "Request rejected, keyset chosen does not match the server's.",
                         -5: "Invalid encoding of proof, should be base64.",
                         -6: "Curve point deserialization failure in proof.",
-                        -7: "PedDLEQ proof deserialization failed."}
+                        -7: "PedDLEQ proof deserialization failed.",
+                        -8: "Curve tree proof deserialization failed."}
 
 RPC_CREATEKEYS_ERRORCODES = {0: "New key and address generated successfully",
                              -1: "Undefined failure in key generation.",
@@ -67,13 +69,17 @@ class AutctConfig:
     base64_proof: bool = False
     bc_network: str = 'signet'
 
-    def config_to_proof_req(self):
+    def config_to_proof_req(self, password: str):
+        # The private key file is encrypted, so the server needs
+        # the password to read it. As in the autct CLI, the password
+        # is not part of the config.
         return {"keyset":self.keysets,
                 "depth":self.depth,
                 "generators_length_log_2":self.generators_length_log_2,
                 "user_label":self.user_string,
-                "key_credential":self.privkey_file_str,
-                "bc_network":self.bc_network}
+                "privkey_file_loc":self.privkey_file_str,
+                "bc_network":self.bc_network,
+                "encryption_password":password}
 
     def config_to_verify_req(self, proof):
         # Note that for some reason, the verify call specifically
@@ -88,9 +94,11 @@ class AutctConfig:
                 "application_label":"autct-v1.0",
                 "proof":proof}
 
-    def config_to_createkeys_request(self):
+    def config_to_createkeys_request(self, password: str):
+        # the password is used to encrypt the new private key file:
         return {"bc_network": self.bc_network,
-                "privkey_file_loc": self.privkey_file_str}
+                "privkey_file_loc": self.privkey_file_str,
+                "encryption_password": password}
 
 def get_websocket_uri(host: str, port: int=-1, ssl: bool=False):
     header = "wss" if ssl else "ws"

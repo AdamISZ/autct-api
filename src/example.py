@@ -2,14 +2,16 @@
 from autctapi import *
 import asyncio
 from dataclasses import asdict
+from getpass import getpass
 
 async def run_all_requests_example():
     # The following examples illustrate correct usage of the API in its 3 calls:
     # 1. "prove" - for which you need to provide the file location of the
-    #    relevant private key; the proof will be returned in base64.
+    #    relevant private key, and the password it is encrypted with;
+    #    the proof will be returned in base64.
     # 2. "verify" - for which you need to pass in the proof in base64.
-    # 3. "createkeys" - will store a new private key in a file and give the
-    #    corresponding taproot address.
+    # 3. "createkeys" - will store a new private key in a file, encrypted
+    #    with the given password, and give the corresponding taproot address.
 
     # First, create a default config set:
     config = AutctConfig()
@@ -27,10 +29,13 @@ async def run_all_requests_example():
     # ~/.config/autct/default-config.toml for the full list.
 
     # parameters for "prove":
-    # this is just an example; the private key 040404... stored in a file
+    # this is just an example; the private key 040404... stored in a file,
+    # encrypted with a password (as is done by "createkeys", or by the
+    # autct CLI's "encryptkey" mode).
     config.privkey_file_str = "privkey-four"
+    password = getpass("Enter password to decrypt private key: ")
 
-    proving_request = config.config_to_proof_req()
+    proving_request = config.config_to_proof_req(password)
     proving_result = await rpc_request(asdict(config), "RPCProver.prove",
                                        proving_request)
     if proving_result["accepted"] == 0:
@@ -61,7 +66,8 @@ async def run_all_requests_example():
     # lastly we create a new key and taproot address;
     # specify a file location for the private key:
     config.privkey_file_str = "new-privkey"
-    createkeys_request = config.config_to_createkeys_request()
+    new_password = getpass("Enter a password to encrypt the new private key: ")
+    createkeys_request = config.config_to_createkeys_request(new_password)
     createkeys_result = await rpc_request(asdict(config),
                         "RPCCreateKeys.createkeys", createkeys_request)
     print("Server response: \n{}".format(
